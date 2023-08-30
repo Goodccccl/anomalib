@@ -40,55 +40,6 @@ std::vector<unsigned char> load_engine(const std::string enginePath)
 	return data;
 }
 
-//void inference(const std::string enginePath, Parameters param, const cv::Mat& src, cv::Mat& result)
-//{
-//	std::vector<unsigned char> model_data = load_engine(enginePath);
-//	nvinfer1::IRuntime* runtime = nvinfer1::createInferRuntime(sample::gLogger.getTRTLogger());
-//	nvinfer1::ICudaEngine* engine = runtime->deserializeCudaEngine(model_data.data(), model_data.size());
-//	if (engine == nullptr)
-//	{
-//		printf("Deserialize cuda engine failed!\n");
-//		runtime->destroy();
-//	}
-//	nvinfer1::IExecutionContext* context = engine->createExecutionContext();
-//	cudaStream_t stream;
-//	cudaStreamCreate(&stream);
-//
-//	float* inputData_vec = preprocess(src);
-//	//std::ofstream infile("F:\\1.txt");
-//	//for (int i = 0; i < param.batch_size * param.input_channels * param.input_height * param.input_width; i++)
-//	//{
-//	//	infile << inputData_vec[i] << std::endl;
-//	//}
-//	//infile.close();
-//	void* input_mem{ nullptr };
-//	cudaMalloc(&input_mem, param.batch_size * param.input_channels * param.input_height * param.input_width);
-//	void* output_mem{ nullptr };
-//	cudaMalloc(&output_mem, param.output_size);
-//	//void* score_{ nullptr };
-//	//cudaMalloc(&score_, param.score_size * sizeof(float));
-//
-//	CUDA_CHECK(cudaMemcpyAsync(input_mem, inputData_vec, param.batch_size * param.input_channels * param.input_height * param.input_width, cudaMemcpyHostToDevice), stream);
-//
-//	void* bindings[] = { input_mem, output_mem };
-//	auto start = std::chrono::system_clock::now();
-//	//context->enqueueV2(bindings, stream, nullptr);
-//	context->enqueue(1, bindings, stream, nullptr);
-//	auto end = std::chrono::system_clock::now();
-//	std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << "ms" << std::endl;
-//	float* outputData = new float[param.output_size];
-//	//float* score = new float[param.score_size];
-//	//CUDA_CHECK(cudaMemcpyAsync(score, score_, param.score_size * sizeof(float), cudaMemcpyDeviceToHost), stream);
-//	CUDA_CHECK(cudaMemcpyAsync(outputData, bindings[1], 1, cudaMemcpyDeviceToHost), stream);
-//
-//	std::ofstream outfile("F:\\1234.txt");
-//	for (int i = 0; i < param.output_size; i++)
-//	{
-//		outfile << outputData[i] << std::endl;
-//	}
-//	outfile.close();
-//}
-
 
 int volume(nvinfer1::Dims dims)
 {
@@ -155,5 +106,10 @@ void inference2(const std::string enginePath, Parameters param, const cv::Mat& s
 	
 	cv::Mat anomaly_map;
 	anomaly_map = cv::Mat(cv::Size(param.input_height, param.input_width), CV_32FC1, outputs[1]);
-
+	auto hot = anomaly_map.clone();
+	double minValue, maxValue;
+	cv::minMaxLoc(hot, &minValue, &maxValue);
+	hot = (hot - minValue) / (maxValue - minValue);
+	hot.convertTo(hot, CV_8UC1, 255, 0);
+	cv::imwrite("D:\\123.png", hot);
 }

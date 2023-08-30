@@ -9,7 +9,7 @@ int main()
 	param.input_height = 452;
 	param.input_width = 452;
 
-	std::string img_path = "G:\\estimate_811\\membrane_cut\\Image_20230807130642587_0.bmp";
+	std::string img_path = "G:\\estimate_811\\membrane_cut\\Image_20230807130642587_60.bmp";
 	std::string trt_path = "D:\\TensorRT-8.6.1.6\\bin\\model.trt";
 	cv::Mat image = cv::imread(img_path, 1);
 	//float* input_data = preprocess(image);
